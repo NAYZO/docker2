@@ -1,0 +1,74 @@
+###############################################################################
+#                          Created By Ala Eddine Khefifi                      #
+###############################################################################
+version: "3.2"
+services:
+
+  db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ${DATABASE_PATH}:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  php:
+    build: docker/php-fpm
+    working_dir: ${DOCKER_APP_PATH}
+    container_name: docker_php
+    depends_on:
+      - db
+#      - redis
+    volumes:
+      - ${APP_PUBLIC_PATH}:${DOCKER_APP_PATH}
+
+  nginx:
+    build: docker/nginx
+    container_name: docker_nginx
+    volumes:
+      - ${APP_PUBLIC_PATH}:${DOCKER_APP_PATH}
+    depends_on:
+      - php
+    ports:
+      - "80:80"
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+        - "5672:5672"
+        - "15672:15672"
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - php
+
+#  redis:
+#    image: redis:4.0
+#    ports:
+#        - "6379:6379"
+#
+#  elasticsearch:
+#    image: elasticsearch:2.4.6
+#    ports:
+#      - "9200:9200"
+#      - "9300:9300"
+#
+#  phpmyadmin:
+#    image: phpmyadmin/phpmyadmin
+#    ports:
+#        - "8080:80"
+#     environment:
+#           - PMA_HOST=phpmyadmin
+#    depends_on:
+#        - db
