@@ -6,6 +6,7 @@ services:
 
   db:
     image: mysql:5.7
+    container_name: docker_db
     environment:
       - MYSQL_USER=root
       - MYSQL_PASSWORD=root
@@ -37,6 +38,7 @@ services:
 
   rabbitmq:
     image: "rabbitmq:3-management"
+    container_name: docker_rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "guest"
@@ -47,6 +49,7 @@ services:
 
   adminer:
     image: adminer
+    container_name: docker_adminer
     ports:
       - "8080:8080"
     depends_on:
